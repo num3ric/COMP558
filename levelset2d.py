@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-area_width = 100
+area_width = 15
 
 bbox=(-2.5,2.5)
 
@@ -117,40 +117,52 @@ def get_explicit_level_points(fn, threshold = 0.03, centerX = 0, centerY=0, radi
 	Y = Y[np.absolute(Z) < threshold]
 	return X, Y
 
-def get_psi_level_points(X, Y, Z, threshold = 0.03):
-	X = X[np.absolute(Z) < threshold] 
-	Y = Y[np.absolute(Z) < threshold]
+def get_psi_level_points(X, Y, psi, threshold = 0.03):
+	X = X[np.absolute(psi) < threshold] 
+	Y = Y[np.absolute(psi) < threshold]
 	return X, Y
 
 def evolve_interface(psi):
 	'''
 	TODO: Lots of work here to complete this function!
 	'''
-	dX, dY, dZ = np.gradient(psi)
-	M = np.sqrt(np.vdot(dX, dX)+np.vdot(dY, dY)+np.vdot(dZ, dZ))
-	return psi + 0.01*M
+	dX, dY = np.gradient(psi)
+	print dX
+	print dY
+	M = np.sqrt(np.vdot(dX, dX)+np.vdot(dY, dY))
+	print M
+	return psi + 0.1*M
 
-A = np.linspace(bbox[0],bbox[1], 15)#area_width)
-psiX,psiY = np.meshgrid(A, A)
+A = np.linspace(bbox[0],bbox[1], area_width)
+X,Y = np.meshgrid(A, A)
 # psiZ = step_function(psiX, psiY, 0.5)
-psiZ = circle(psiX, psiY, radius=2)
-psi0 = np.array([psiX, psiY, psiZ])
-psi1 = np.array([psiX, psiY, psiZ])
 
-X, Y = get_explicit_level_points(square, centerX=-1, centerY=0, radius= 0.5)
-plt.plot(X,Y, 'bo')
-X, Y = get_explicit_level_points(circle, centerX=1, centerY=0, radius= 0.5)
-plt.plot(X,Y, 'bo')
+psi0 = circle(X, Y, radius=2)
+psi1 = np.array(psi0)
+# X, Y = get_explicit_level_points(square, centerX=-1, centerY=0, radius= 0.5)
+# plt.plot(X,Y, 'bo')
+# X, Y = get_explicit_level_points(circle, centerX=1, centerY=0, radius= 0.5)
+# plt.plot(X,Y, 'bo')
 # X, Y = get_explicit_level_points(circle, centerX=0, centerY=0, radius= 2.0)
 # plt.plot(X,Y, 'bo')
-psi1 = evolve_interface(psi0)
-X, Y = get_psi_level_points(*psi1)
-plt.plot(X, Y,'ro')
 
+psi1 = evolve_interface(psi0)
+# print "psi0"
+# print psi0
+# print "psi1"
+# print psi1
+# X, Y = get_psi_level_points(X, Y, psi1)
+# plt.plot(X, Y,'ro')
+print np.shape(X), np.shape(Y), np.shape(psi0)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(*psi1, rstride=4, cstride=4, cmap=cm.jet,
-        linewidth=0, antialiased=False)
+# ax.plot_surface(X, Y, psi0, rstride=1, cstride=1, cmap=cm.jet,
+#         linewidth=0, antialiased=False)
+# ax.plot_surface(X, Y, psi1, rstride=1, cstride=1, cmap=cm.jet,
+#         linewidth=0, antialiased=False)
+
+ax.contour(X, Y, psi0)
+ax.contour(X, Y, psi1)
 
 plt.show()
 
