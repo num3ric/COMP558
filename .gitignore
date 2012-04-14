@@ -6,4 +6,6 @@
 *.nav
 *.snm
 *.toc
+*.fdb_latexmk
+*.synctex.gz
 untracked/
