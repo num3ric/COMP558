@@ -1,2 +1,9 @@
 *.pyc
+*.log
+*.out
+*.pdf
+*.aux
+*.nav
+*.snm
+*.toc
 untracked/
