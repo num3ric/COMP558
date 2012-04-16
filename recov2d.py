@@ -10,7 +10,7 @@ import itertools
 
 eps = sys.float_info.epsilon
 
-im = numpy.array(Image.open("cir.png"))
+im = numpy.array(Image.open("caj.png"))
 im = im / im.max()
 # plt.figure()
 # plt.imshow(im, cmap='gray')
@@ -46,7 +46,7 @@ A=(numpy.sqrt(X ** 2 + Y ** 2) - edt_im)
 print A.max(), A.min()
 
 # Create initial implicit curve
-# width = 35
+# width = 5
 # phi = numpy.ones(im.shape)
 # phi[width-1:-width+1, width-1:-width+1] = 0
 # phi[width:-width, width:-width] = -1
@@ -56,10 +56,10 @@ n, m = phi.shape
 phi[n/2, m/2] = 0
 phi = numpy.round(ndimage.distance_transform_edt(phi) - 5*n/12)
 
-plt.figure()
-plt.imshow(phi, cmap='gray', interpolation='none')
-plt.contour(phi, levels=[0])
-plt.show()
+# plt.figure()
+# plt.imshow(phi, cmap='gray', interpolation='none')
+# plt.contour(phi, levels=[0])
+# plt.show()
 
 print (phi==0).any()
 
@@ -94,7 +94,29 @@ def div(u, v):
     [vu, vv] = numpy.gradient(v)
     return uu + vv
 
-im = ndimage.gaussian_filter(im, 3)
+# Make sure we have a nice curve as our dataset
+n_im = numpy.round(2.0*(ndimage.gaussian_filter(im-0.5,1)))
+
+print "any n_im==0", (im==0).any()
+d_im = ndimage.distance_transform_edt(n_im)
+[d_im_u, d_im_v] = numpy.gradient(d_im)
+md = numpy.maximum(numpy.sqrt(d_im_u**2 + d_im_v**2), eps)
+
+# fig = plt.figure()
+# cax = plt.imshow(md)
+# plt.colorbar(cax)
+# plt.show()
+
+fig = plt.figure()
+cax = plt.imshow(n_im==0, interpolation='none')
+plt.colorbar(cax)
+plt.show()
+
+# fig = plt.figure()
+# cax = plt.imshow(d_im)
+# plt.colorbar(cax)
+# plt.show()
+
 [im_u, im_v] = numpy.gradient(im)
 # plt.figure()
 # plt.subplot(121)
@@ -103,26 +125,25 @@ im = ndimage.gaussian_filter(im, 3)
 # plt.imshow(ndimage.laplace(im))
 
 # Compute the mean curvature K
-im_g = numpy.sqrt(im_u**2 + im_v**2)
-d = numpy.maximum(im_g, eps)
-K = d * div(im_u / d, im_v / d)
+# im_g = numpy.sqrt(im_u**2 + im_v**2)
+# d = numpy.maximum(im_g, eps)
+# K = d * div(im_u / d, im_v / d)
 # plt.figure()
 # plt.subplot(121)
 # plt.imshow(im, cmap='gray')
 # plt.subplot(122)
 # plt.imshow(K)
 
-dt = 0.5
+dt = 0.01
 p = phi0
-
-i = 0
 
 def update_phi(p, dt):
     [pu, pv] = numpy.gradient(p)
     abs_grad_p = numpy.maximum(numpy.sqrt(pu**2 + pv**2), eps)
-    PF = (im_u * pu + im_v * pv) / abs_grad_p
-    ST = d * div(pu / abs_grad_p, pv / abs_grad_p)
+    PF = (d_im_u * pu + d_im_v * pv) / abs_grad_p
+    ST = d_im * div(pu / abs_grad_p, pv / abs_grad_p)
     return p + dt * (PF + ST) * abs_grad_p
+
 
 plt.ion()
 fig = plt.figure()
@@ -134,6 +155,9 @@ for i in itertools.count():
         plt.contour(p, levels=[0])
         fig.colorbar(cax)
         plt.draw()
+    if i % 50 == 0:
+        pedt = ndimage.distance_transform_edt(numpy.round(p))
+        p = numpy.sign(p) * pedt
 
 # def updatefig(*args):
 #     global p, i
