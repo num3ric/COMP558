@@ -48,7 +48,7 @@ Kinect characteristics:
 
 \begin{frame}{Introduction 2}
   \begin{itemize}
-  \item Reconstructing a surface from an unorganized dataset of points, how can we deal with:
+  \item Reconstructing a surface from an dataset of points, how can we deal with:
   \begin{enumerate}
     \item Complex topologies (and topological changes)
     \item Noise in the data
@@ -113,7 +113,9 @@ F = \nabla d(\mathbf{x}) \cdot \frac{\nabla \phi}{\| \nabla \phi \|}
 \begin{frame}{Energy Functional}
 Where does this force formulation comes from? Derived from energy functional $E(\Gamma)$.
 \begin{itemize}
-\item Quantifies how $\Gamma$ corresponds to the data set
+% Think of an elastic membrane
+%attraction to points, push against high-curvature regions in the data
+\item Quantifies how $\Gamma$ corresponds to the data set, with a smoothness constraint
 \item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
 \end{itemize}
 It can be shown that the minimizer of the functional satisfies:
@@ -152,6 +154,9 @@ It can be shown that the minimizer of the functional satisfies:
 \begin{frame}{Experimental Results}
 
 \end{frame}
+
+%Positive aspects (some mentionned earlier)
+%accuracy, generality
 
 \begin{frame}{Problems with this method}
   \begin{itemize}
