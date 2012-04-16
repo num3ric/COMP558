@@ -55,6 +55,15 @@ In 3d:
 \Gamma(t) = \{(x,y,z) \; | \; \phi(x,y,z,t) = 0\}
 \]
 
+\begin{itemize}
+\item $\mathcal{S}$ : Data set of points.
+\item $\Gamma$ : Level set/surface.
+\item $\phi$ :
+\end{itemize}
+
+\Gamma
+\mathcal{S} Data set.
+\]
 \paragraph{Gradient}
 \begin{itemize}
 \item central differences
@@ -69,7 +78,29 @@ First, we start with a constant force.
 \item surface tension
 \end{itemize}
 
+\subparagraph{Forces governing the surface evolution}
+\begin{itemize}
+\item attraction to data points, $\del d($
+\item surface tension
+\end{itemize}
+
+
+Uses the euclidean distance function, (matrix - laplacian for constraint (slowing down)).
+
+Minimizing the distance function, we have two global minima: $\Gamma - \Gamma_0$ and $\Gamma - 	\emptyset$.
+
+We can either start the surface evolution outside or inside $Gamma_0$. Starting outside is the prefered approach because it cannot converge to $\emptyset$.
+
 \paragraph{Reinitialization}
+
+
+problems;
+extra dim - extra computation time -> resol narrow bands
+grid precision - definition (adaptative)
+
+kinect data:
+clipping?
+discontinuities keep
 
 
 \end{document}
