@@ -64,12 +64,13 @@ Kinect characteristics:
   \begin{itemize} %example
   \item \textbf{Explicit surface} %describes the precise location of a surface
   \begin{enumerate}
-    \item Voronoi diagrams
+    \item Voronoi diagrams %computational geometry approaches
     \item Delaunay triangulations
   \end{enumerate}
   \item \textbf{Implicit surface} %describes a particular isocontour of a scalar field
   \begin{enumerate}
     \item Poisson reconstruction
+    % assume oriented points, find indicator function trough laplacian and divergence of the vector field of oriented points
     \item Level Set Method
   \end{enumerate}
   \end{itemize}
@@ -162,6 +163,7 @@ It can be shown that the minimizer of the functional satisfies:
   \begin{itemize}
   \item Extra dimensions affect computation time
   \item Dependence on grid precision
+  %need to convert back to explicit?
   \end{itemize}
 \end{frame}
 
