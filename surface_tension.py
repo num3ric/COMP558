@@ -135,7 +135,7 @@ def compute_force(U, V, Gmag):
     '''
     PF = (Du * U + Dv * V)/Gmag
     ST = D * divergence(U/Gmag, V/Gmag)
-    return ST
+    return PF + ST
 
 # unitF = np.ones(grid_shape)
 
