@@ -62,54 +62,6 @@ def gradient_magnitude(U, V):
     '''
     return np.maximum(np.sqrt(U**2 + V**2), eps)
 
-def upwind_gradient2d(f, a):
-    # This blows up everything right now...
-    #TODO: Convert to something faster!
-    otype = f.dtype.char
-    if otype not in ['f', 'd', 'F', 'D']:
-        otype = 'd'
-    outu = np.zeros_like(f).astype(otype)
-    outv = np.copy(outu)
-    #can't use slices on edges because it depends on sign(a)
-    for x in xrange(f.shape[0]):
-        for y in xrange(f.shape[1]):
-            if a[x,y] < 0:
-                if x == outu.shape[0]-1:
-                    outu[x,y] = f[x,y] - f[x-1, y]
-                else:
-                    outu[x,y] = f[x+1,y] - f[x,y]
-            elif a[x,y] > 0:
-                if x == 0:
-                    outu[x,y] = f[x+1,y] - f[x,y]
-                else:
-                    outu[x,y] = f[x,y] - f[x-1, y]
-            else:
-                if x == outu.shape[0]-1:
-                    outu[x,y] = f[x,y] - f[x-1, y]
-                elif x == 0:
-                    outu[x,y] = f[x+1,y] - f[x,y]
-                else:
-                    outu[x,y] = f[x+1,y] - f[x-1, y]
-
-            if a[x,y] < 0:
-                if y == outv.shape[0]-1:
-                    outv[x,y] = f[x,y] - f[x, y-1]
-                else:
-                    outv[x,y] = f[x,y+1] - f[x,y]
-            elif a[x,y] > 0:
-                if y == 0:
-                    outv[x,y] = f[x,y+1] - f[x,y]
-                else:
-                    outv[x,y] = f[x,y] - f[x, y-1]
-            else:
-                if y == outv.shape[0]-1:
-                    outv[x,y] = f[x,y] - f[x, y-1]
-                elif x == 0:
-                    outv[x,y] = f[x,y+1] - f[x,y]
-                else:
-                    outv[x,y] = f[x,y+1] - f[x, y-1]
-    return [outu, outv]
-
 
 S = square(radius=50, spacing=10) # data set of points
 D = ndimage.distance_transform_edt(1-S) # distance to data set
@@ -146,19 +98,16 @@ def update_phi(P, dt):
     [U, V] = np.gradient(P)
     Gmag = gradient_magnitude(U, V)
     F = compute_force(U, V, Gmag)
-    return P + dt * F * Gmag #, F
+    return P + dt * F * Gmag
 
 # def renormalize(P, dt): #not working...
 #     [U, V] = np.gradient(P)
 #     Gmag = gradient_magnitude(U, V)
 #     S = P/np.sqrt(P*P + Gmag)
 #     return P + dt*S * (1-Gmag)
-    
 
 dt = 0.01
 P = Phi0
-# gU, gV = np.gradient(P)
-# Force = compute_force(gU, gV, gradient_magnitude(gU, gV))
 plt.ion()
 fig = plt.figure()
 for i in itertools.count():
