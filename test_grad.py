@@ -118,7 +118,7 @@ def upwind_boundary_gradient2d(f):
     for i, x in enumerate(f):
         i_plus = (i+1) % f.shape[0]
         outu[i,:] = np.maximum(np.maximum(f[i-1,:] - f[i,:], f[i_plus,:] - f[i,:]), zeros)
-    for j, y in enumerate(f.transpose()):
+    for j, y in enumerate(np.transpose(f)):
         j_plus = (j+1) % f.shape[1]
         outv[:,j] = np.maximum(np.maximum(f[:,j-1] - f[:,j], f[:,j_plus] - f[:,j]), zeros)
     return [outu, outv]
@@ -138,7 +138,7 @@ def lsm_grad_magnitude(f, plus=True):
         else:
             outu[i,:] = np.square(np.maximum(f[i_plus,:] - f[i,:], zeros)) + \
                         np.square(np.minimum(f[i-1,:] - f[i,:], zeros))
-    for j, y in enumerate(f.transpose()):
+    for j, y in enumerate(np.transpose(f)):
         j_plus = (j+1) % f.shape[1]
         if plus:
             outv[:,j] = np.square(np.maximum(f[:,j-1] - f[:,j], zeros)) + \
