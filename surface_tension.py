@@ -155,7 +155,7 @@ def update_phi(P, dt):
 #     return P + dt*S * (1-Gmag)
     
 
-dt = 0.02
+dt = 0.01
 P = Phi0
 # gU, gV = np.gradient(P)
 # Force = compute_force(gU, gV, gradient_magnitude(gU, gV))
@@ -163,15 +163,15 @@ plt.ion()
 fig = plt.figure()
 for i in itertools.count():
     P = update_phi(P, dt)
-    if i % 50 == 0:
+    if i % 120 == 0:
         plt.clf()
         cax = plt.imshow(P, cmap='jet')
         plt.contour(P, levels=[0])
         fig.colorbar(cax)
         plt.draw()
-    # if i % 50 == 0:
-    #     Pedt = ndimage.distance_transform_edt(np.round(P))
-    #     P = np.sign(P) * Pedt
+    if i % 50 == 0:
+        Pedt = ndimage.distance_transform_edt(np.round(P))
+        P = np.sign(P) * Pedt
         # P = renormalize(P,1.0)
 
 plt.show()
