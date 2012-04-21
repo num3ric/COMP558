@@ -5,6 +5,7 @@ import itertools
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.cm as cm
+import matplotlib.animation as animation
 from scipy import ndimage
 import Image
 
@@ -30,23 +31,26 @@ P = (image - image.max() / 2) / 255
 # fig = plt.figure()
 #plt.contour(P, levels=[0], colors='r')
 # im = plt.imshow(P, cmap=cm.gray)
-dt = 0.05
+dt = 1
 F =constraint
+fig = plt.figure()
+plt.clf()
+im = plt.imshow(P, cmap='jet')
+plt.contour(P, levels=[0])
+# fig.colorbar(im)
+plt.draw()
+
 def update_phi(P, dt):
 	[Px, Py] = np.gradient(P)
 	P += dt * F * np.sqrt(Px**2 + Py**2)
 	return P
 
-plt.ion()
-fig = plt.figure()
-for i in itertools.count():
+def updatefig(*args):
+    global P
     P = update_phi(P, dt)
-    if i % 20 == 0:
-        plt.clf()
-        # cax = plt.imshow(P, cmap='jet')
-        plt.contour(P, levels=[0])
-        # fig.colorbar(cax)
-        plt.draw()
+    im.set_array(P)
+    return im,
 
+ani = animation.FuncAnimation(fig, updatefig, interval=50, blit=True)
 plt.show()
 #fig.savefig('test_plot')
