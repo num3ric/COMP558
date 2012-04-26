@@ -29,12 +29,11 @@ reconstructed surface should be representative of the point could data.
 \section{Framework}
 
 \paragraph{Discretization}
-\subparagraph{Upwind Scheme}
 
-Given that the surface motion equation \cite{moler2003nineteen} for $\phi$ is
-defined as a partial differential equation, we can solve it using iterative
-schemes for PDEs. As most differential equations which might appear fairly
-innocuous at first, solving them numerically can be quite challenging.
+Given that the surface motion equation for $\phi$ is defined as a partial
+differential equation, we can solve it using iterative schemes for PDEs. As most
+differential equations which might appear fairly innocuous at first, solving
+them numerically can be quite challenging.
 
 Given an initial value $\phi_0$, our first intution might be to apply the
 first-order Euler method as follows:
@@ -45,9 +44,15 @@ first-order Euler method as follows:
 \end{align}
 
 However, not only does the Euler method often suffers from stability problems,
-it is used in the context of \textit{ordinary differential equations}, not
-PDEs. In that case, a different numerical procedure is needed.  One approach
-defined for the initial value formulation by Sethian is called the
+it is used in the context of \textit{ordinary differential equations}, not PDEs.
+In that case, a different numerical procedure is needed. 
+
+\subparagraph{Upwind Scheme}
+One approach defined for the initial value formulation by
+Sethian\cite{sethian1999level} \cite{sethian1999advancing} is called the upwind
+scheme.  Instead of using central differences for computing the partial
+derivatives, it uses both a forward or a backward difference.
+
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
