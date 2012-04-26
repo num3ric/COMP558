@@ -10,7 +10,7 @@ import itertools
 
 eps = sys.float_info.epsilon
 
-im = numpy.array(Image.open("caj.png"))
+im = numpy.array(Image.open("moo.png"))
 im = im / im.max()
 # plt.figure()
 # plt.imshow(im, cmap='gray')
@@ -46,15 +46,15 @@ A=(numpy.sqrt(X ** 2 + Y ** 2) - edt_im)
 print A.max(), A.min()
 
 # Create initial implicit curve
-# width = 5
-# phi = numpy.ones(im.shape)
-# phi[width-1:-width+1, width-1:-width+1] = 0
-# phi[width:-width, width:-width] = -1
-
+width = 5
 phi = numpy.ones(im.shape)
-n, m = phi.shape
-phi[n/2, m/2] = 0
-phi = numpy.round(ndimage.distance_transform_edt(phi) - 5*n/12)
+phi[width-1:-width+1, width-1:-width+1] = 0
+phi[width:-width, width:-width] = -1
+
+# phi = numpy.ones(im.shape)
+# n, m = phi.shape
+# phi[n/2, m/2] = 0
+# phi = numpy.round(ndimage.distance_transform_edt(phi) - 5*n/12)
 
 # plt.figure()
 # plt.imshow(phi, cmap='gray', interpolation='none')
@@ -95,7 +95,8 @@ def div(u, v):
     return uu + vv
 
 # Make sure we have a nice curve as our dataset
-n_im = numpy.round(2.0*(ndimage.gaussian_filter(im-0.5,1)))
+# n_im = numpy.round(2.0*(ndimage.gaussian_filter(im-0.5,1)))
+n_im = numpy.round(5.0*(im-0.5))
 
 print "any n_im==0", (im==0).any()
 d_im = ndimage.distance_transform_edt(n_im)
@@ -108,7 +109,7 @@ md = numpy.maximum(numpy.sqrt(d_im_u**2 + d_im_v**2), eps)
 # plt.show()
 
 fig = plt.figure()
-cax = plt.imshow(n_im==0, interpolation='none')
+cax = plt.imshow(n_im==0, cmap='gray', interpolation='none')
 plt.colorbar(cax)
 plt.show()
 
@@ -134,7 +135,7 @@ plt.show()
 # plt.subplot(122)
 # plt.imshow(K)
 
-dt = 0.01
+dt = 0.1
 p = phi0
 
 def update_phi(p, dt):
@@ -154,7 +155,8 @@ for i in itertools.count():
         cax = plt.imshow(p, cmap='jet')
         plt.contour(p, levels=[0])
         fig.colorbar(cax)
-        plt.draw()
+        #plt.draw()
+        plt.savefig("frame/%02d.png" % (i//50), dpi=100)
     if i % 50 == 0:
         pedt = ndimage.distance_transform_edt(numpy.round(p))
         p = numpy.sign(p) * pedt
