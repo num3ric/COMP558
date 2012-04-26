@@ -1,0 +1,28 @@
+\documentclass{article}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\author{Alexandre Vassalotti - \'{E}ric Renaud-Houde}
+\title{COMP558 Final Project Notes}
+
+\begin{document}
+\maketitle
+\setlength{\jot}{11pt}
+\section{Introduction}
+
+\section{Framework}
+
+\paragraph{Discretization}
+\subparagraph{Upwind Scheme}
+
+Given that the surface motion equation for $\phi$ is defined as a partial differential equation, we can solve it using iterative schemes for PDEs. As most differential equations which might appear fairly innocuous at first, solving them numerically can be quite challenging. \\
+
+ Given an initial value $\phi_0$, our first intution might be to apply the first-order Euler method as follows:
+\begin{align}
+    \frac{\partial \phi}{\partial t} + F \|\nabla \phi\| &= 0 \\
+    \frac{\phi^{t+1} - \phi^{t}}{\Delta t} &=  -F \|\nabla \phi\| \\
+    \phi^{t+1} &= \phi^{t} - \Delta t \; F \|\nabla \phi\| 
+\end{align}
+
+However, not only does the Euler method often suffers from stability problems, it is used in the context of \textit{ordinary differential equations}, not PDEs. In that case, a different numerical procedure is needed.
+One approach defined for the initial value formulation by Sethian is called the 
+\end{document}
