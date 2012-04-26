@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,amssymb,amsthm, graphicx}
 \usepackage{mathpazo}
 \author{Alexandre Vassalotti \quad \'{E}ric Renaud-Houde}
 \title{COMP 558: Final Project Report \\
@@ -48,11 +48,94 @@ it is used in the context of \textit{ordinary differential equations}, not PDEs.
 In that case, a different numerical procedure is needed. 
 
 \subparagraph{Upwind Scheme}
-One approach defined for the initial value formulation by
-Sethian\cite{sethian1999level} \cite{sethian1999advancing} is called the upwind
-scheme.  Instead of using central differences for computing the partial
-derivatives, it uses both a forward or a backward difference.
+One approach for discretizing PDEs, originally defined by Couran, Isaacson and
+Rees \cite{courant1952solution} is called the upwind scheme. Instead of using
+central differences for computing the partial derivatives, it uses both a
+forward or a backward difference:
 
+\begin{align}
+    \frac{\partial \phi}{\partial x}^{-} &= \phi^{-}_x = \frac{\phi_i -
+    \phi_{i-1}}{ \Delta x} = \phi_i - \phi_{i-1} \\
+    \frac{\partial \phi}{\partial x}^{+} &= \phi^{+}_x = \frac{\phi^{i+1}_x -
+    \phi^i_x}{ \Delta x} = \phi^{i+1}_x - \phi^i_x  
+\end{align} since $ \Delta x = 1 $ in our grid. The same applies for other axes
+$y$ and $z$.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{img/upwind_grid.png}
+  \caption{Illustration of the forward and backward differences over a 2d grid.}    
+\end{figure}
+
+
+Later used by Sethian\cite{sethian1999level} \cite{sethian1999advancing} for
+the initial value formulation, he defines the classical level set method as
+follows (let $ p = \phi_{ijk}$):
+
+\[
+p^{n+1} = p^{n} - \Delta t [ \max(F_{ijk}, 0) \| \nabla p \|^{+} + \min(F_{ijk}, 0)
+\| \nabla p \|^{-} ]
+\]
+where:
+\begin{align}
+    \| \nabla p \|^{+} & = 
+    \begin{bmatrix}
+        \max(p^{-}_x, 0)^2 + \min(p^{+}_x, 0)^2 + \\
+        \max(p^{-}_y, 0)^2 + \min(p^{+}_y, 0)^2 + \\
+        \max(p^{-}_z, 0)^2 + \min(p^{+}_z, 0)^2
+    \end{bmatrix}^{1/2}  \\
+    \| \nabla p \|^{-} & = 
+    \begin{bmatrix}
+        \max(p^{+}_x, 0)^2 + \min(p^{-}_x, 0)^2 + \\
+        \max(p^{+}_y, 0)^2 + \min(p^{-}_y, 0)^2 + \\
+        \max(p^{+}_z, 0)^2 + \min(p^{-}_z, 0)^2
+    \end{bmatrix}^{1/2} 
+\end{align}
+
+Rewriting this equation in terms of the entire grid matrices, and defining
+$\odot$ as element-wise matrix mutiplication, we have the following formulation
+which updates our entire grid for $\phi$:
+\[
+\phi^{n+1} = \phi^{n} - \Delta t [ \max(F, 0) \odot \| \nabla \phi \|^{+} +
+\min(F, 0) \odot \| \nabla \phi \|^{-} ]
+\]
+
+As opposed to computing the magnitude of the gradient using the central
+differences functions, the evolution of $\phi$ under the upwind scheme is much
+more stable. Note that there are higher-order schemes listed in
+\cite{sethian1999level} if more stability is required.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{img/up01.png}
+  \caption{Initial hypersurface $\phi$ defined as a signed distance function
+  (for a level set in 2d).}    
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{img/up03.png}
+  \caption{Result of 140 iterations using $\Delta t = 0.5$ and a constant force of 1
+  using the central differences approximations. The resulting hypersurface has
+  exploded in the center and near
+  the borders.}    
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{img/up02.png}
+  \caption{Result of 140 iterations using $ \Delta t = 0.5$ and a constant force of 1
+  using the upwind scheme. The hypersurface evolution is perfectly stable. It
+  ultimately flattens out and remain so.}    
+\end{figure}
+
+\subparagraph{Implementation}
+To implement the upwind scheme for the entire grid update, a few strategies can
+be used. In the contex of matlab or numpy, it is recommended to compute forward
+and backward differences using entire rows. Also note that only one matrix is
+needed because the squared differences can be added on top of each other.
+Furthermore for the edges of the grid, the inward row/column should be used in
+replacement if the difference exceeds the matrix.
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
