@@ -11,9 +11,9 @@ import itertools
 
 eps = sys.float_info.epsilon
 
-n, m = 200, 200
-grid_shape = (n,m)
-cx, cy = n/2, m/2
+wx, wy = 200, 200
+grid_shape = (wx,wy)
+cx, cy = wx/2, wy/2
 
 
 def _space_grid(Sm, spacing):
@@ -62,12 +62,60 @@ def gradient_magnitude(U, V):
     '''
     return np.maximum(np.sqrt(U**2 + V**2), eps)
 
+def lsm_grad_magnitude(f, up):
+    otype = f.dtype.char
+    if otype not in ['f', 'd', 'F', 'D']:
+        otype = 'd'
+    out = np.zeros_like(f).astype(otype)
+    for i in xrange(out.shape[0]):
+        if up:
+            if i > 0: #difference with preceding row
+                out[i,:] = (out[i,:]) + np.maximum(f[i,:] - f[i - 1,:], 0)**2
+            else: # difference with next row 'mirrored' outside the matrix
+                out[i,:] = (out[i,:]) + np.maximum(f[i,:] - f[i + 1,:], 0)**2
+            if i < out.shape[0] - 1: #difference from next row
+                out[i,:] = out[i,:] + np.minimum(f[i + 1,:] - f[i,:], 0)**2
+            else: # difference current row with next row 'mirrored' outside the matrix
+                out[i,:] = out[i,:] + np.minimum(f[i - 1,:] - f[i,:], 0)**2
+        else:
+            if i > 0:
+                out[i,:] = (out[i,:]) + np.minimum(f[i,:] - f[i - 1,:], 0)**2
+            else:
+                out[i,:] = (out[i,:]) + np.minimum(f[i,:] - f[i + 1,:], 0)**2
+            if i < out.shape[0] - 1:
+                out[i,:] = out[i,:] + np.maximum(f[i + 1,:] - f[i,:], 0)**2
+            else:
+                out[i,:] = out[i,:] + np.maximum(f[i - 1,:] - f[i,:], 0)**2
+    for j in xrange(out.shape[1]):
+        if up:
+            if j > 0:
+                out[:,j] = out[:,j] + np.maximum(f[:,j] - f[:,j - 1], 0)**2
+            else:
+                out[:,j] = out[:,j] + np.maximum(f[:,j] - f[:,j + 1], 0)**2
+            if j < out.shape[1] - 1:
+                out[:,j] = out[:,j] + np.minimum(f[:,j + 1] - f[:,j], 0)**2
+            else:
+                out[:,j] = out[:,j] + np.minimum(f[:,j - 1] - f[:,j], 0)**2
+        else:
+            if j > 0:
+                out[:,j] = out[:,j] + np.minimum(f[:,j] - f[:,j - 1], 0)**2
+            else:
+                out[:,j] = out[:,j] + np.minimum(f[:,j] - f[:,j + 1], 0)**2
+            if j < out.shape[1] - 1:
+                out[:,j] = out[:,j] + np.maximum(f[:,j + 1] - f[:,j], 0)**2
+            else:
+                out[:,j] = out[:,j] + np.maximum(f[:,j - 1] - f[:,j], 0)**2
+    return np.sqrt(out)
 
-S = square(radius=50, spacing=10) # data set of points
+# S = square(radius=25, spacing=5) # data set of points
+S = np.array(Image.open("double.png"))
+S = ndimage.laplace(ndimage.gaussian_filter(S-0.5,1))
+S = (np.absolute(S) > 50)
 D = ndimage.distance_transform_edt(1-S) # distance to data set
 [Du, Dv] = np.gradient(D)
 # image = np.array(Image.open("cir.png"))
 # Phi0 = (image - image.max() / 2) / 255
+
 Phi0 = np.ones(grid_shape)
 Phi0[cx, cy] = 0
 Phi0 = ndimage.distance_transform_edt(Phi0)
@@ -75,8 +123,9 @@ Phi0 -= 0.65*np.max(Phi0)
 
 # plt.figure()
 # plt.imshow(S)
-# plt.figure()
-# plt.imshow(D)
+# fig = plt.figure()
+# cax = plt.imshow(D)
+# fig.colorbar(cax)
 # plt.figure()
 # plt.imshow(Phi0,cmap='gray')
 # plt.contour(Phi0, levels=[0])
@@ -98,7 +147,11 @@ def update_phi(P, dt):
     [U, V] = np.gradient(P)
     Gmag = gradient_magnitude(U, V)
     F = compute_force(U, V, Gmag)
-    return P + dt * F * Gmag
+    up = lsm_grad_magnitude(P, True)
+    down = lsm_grad_magnitude(P, False)
+    # return P + dt * F * Gmag
+    # return P + dt * (up + down)
+    return P + dt *(np.maximum(F, 0)*down + np.minimum(F, 0)*up)
 
 # def renormalize(P, dt): #not working...
 #     [U, V] = np.gradient(P)
@@ -106,21 +159,26 @@ def update_phi(P, dt):
 #     S = P/np.sqrt(P*P + Gmag)
 #     return P + dt*S * (1-Gmag)
 
-dt = 0.01
+dt = 0.1
 P = Phi0
-plt.ion()
 fig = plt.figure()
-for i in itertools.count():
+
+# plt.ion()
+# for i in itertools.count():
+#     P = update_phi(P, dt)
+#     plt.clf()
+#     im = plt.imshow(P, cmap='jet')
+#     # plt.contour(P, levels=[0])
+#     fig.colorbar(im)
+#     plt.draw()
+
+im = plt.imshow(P, cmap='jet')
+fig.colorbar(im)
+def updatefig(*args):
+    global P
     P = update_phi(P, dt)
-    if i % 120 == 0:
-        plt.clf()
-        cax = plt.imshow(P, cmap='jet')
-        plt.contour(P, levels=[0])
-        fig.colorbar(cax)
-        plt.draw()
-    if i % 50 == 0:
-        Pedt = ndimage.distance_transform_edt(np.round(P))
-        P = np.sign(P) * Pedt
-        # P = renormalize(P,1.0)
+    im.set_array(P)
+    return im,
+ani = animation.FuncAnimation(fig, updatefig, interval=50, blit=True)
 
 plt.show()
