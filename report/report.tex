@@ -2,12 +2,29 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathpazo}
 \author{Alexandre Vassalotti \quad \'{E}ric Renaud-Houde}
-\title{COMP 558 Final Project Report}
+\title{COMP 558: Final Project Report \\
+  \large \textbf{Surface reconstruction using the level set method}
+}
+\date{27 April 2012}
 
 \begin{document}
 \maketitle
-%\setlength{\jot}{11pt}
 \section{Introduction}
+Modelling surfaces from unorganized set of points, or point clouds, is a long
+standing problem in the computer vision community. Indeed, problem is known to
+be very challenging in three and higher dimensions. Furthermore, the problem
+is ill-posed which means there is not a unique solution. When the point cloud
+is dense enough and the topology of the surface is not complicated, a simple
+solution could be to perform a triangulation of points. However, even in this
+context ambiguities can arises and lead to non desirable surface
+reconstructions.
+
+A desirable reconstruction method should be able to deal with irregularities
+caused by noise and non-uniformity of the data collected. A method should also
+be able to deal with complex surface topologies as well. In addition, the
+reconstructed surface should be representative of the point could data.
+
+
 
 \section{Framework}
 
