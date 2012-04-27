@@ -156,10 +156,11 @@ Zhao in \cite{zhao1} and \cite{zhao2001fast} for shape reconstruction from an
 unorganized dataset of points.
 
 Stating his formulation upfront, we have:
-\[
-F = \nabla d(\mathbf{x}) \cdot \frac{\nabla \phi}{\| \nabla \phi \|}
+\begin{align}
+    \label{eq:force}
+    F = \nabla d(\mathbf{x}) \cdot \frac{\nabla \phi}{\| \nabla \phi \|}
 + d(\mathbf{x}) \cdot (\nabla \cdot \frac{\nabla \phi}{\| \nabla \phi \|} )
-\]
+\end{align}
 where $d(\mathbf{x})$ is an unsigned distance function to the closest point in
 our dataset $S$.
 
@@ -167,22 +168,40 @@ The role of this force is twofold: it simultaneously encourages smoothness in
 the level set and close fit to the data points which are attracting it.
 
 \subparagraph{Energy Functional}
-Where does this force formulation comes from? Derived from energy functional
-$E(\Gamma)$.
-\begin{itemize}
-% Think of an elastic membrane
-%attraction to points, push against high-curvature regions in the data
-\item Quantifies how $\Gamma$ corresponds to the data set, with a smoothness
-    constraint
-\item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
-\end{itemize}
-It can be shown that the minimizer of the functional satisfies:
+To understand where this force formulation comes from, we have to understand how
+the desired level set surface is derived from an energy functional $E(\Gamma)$.
+Without restating all the derivations, the functional essentially takes in the
+level set as its input and assesses its surface energy in terms of distance to
+$S$. More precisely, Zhao\cite{zhao1} defined it as follows:
+
+\begin{align}
+    \label{eq:functional}
+    E(\Gamma) = [\int_\Gamma d^p(\mathbf{x}) ds]^{1/p}
+\end{align}
+
+where $ds$ is the surface area, and $p$ parametrizes the distance (or norm)
+function. For the level set to evolve to a local minimum of this energy
+functional, it has to flow according to a force which employs not only
+$d(\mathbf{x})$ but also the normal $\mathbf{N}$ to $\Gamma$ and the mean
+curvature $\kappa$ of $\Gamma$. In fact, in can be shown that the minimizer of
+\eqref{eq:functional} satisfies:
 \[
-\nabla d(\mathbf{x}) \cdot \mathbf{n} + d(\mathbf{x}) \cdot \kappa = 0
+\nabla d(\mathbf{x}) \cdot \mathbf{n} + d(\mathbf{x}) \kappa = 0
 \]
-Note that the level set can reach a local minimum easily if the initial value
-was not close enough to the final surface. As such, it is expected that this
-methods results in some loss of details.
+With these terms used in the force formulation, and with the evolution equation
+expressed for $\phi$, equation \eqref{eq:force} is obtained. (See \cite{zhao1},
+\cite{zhao2001fast} and \cite{savadjiev2003surface} for more detailed
+explanations.) The resulting level set evolution should then behave as an
+elastic membrane converging towards a minimal surface.
+
+%\item Quantifies how $\Gamma$ corresponds to the data set, with a smoothness constraint
+%\item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
+
+\subparagraph{Unsatisfactory local minimum}
+Note that the level set can reach an unsatisfactory local minimum if the initial
+value was not close enough to the final surface. As such, it is expected that
+this methods results in some loss of details.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=1.0\textwidth]{img/savadjiev3_3.png}
@@ -192,6 +211,25 @@ methods results in some loss of details.
   bending and lower points cannot attract the surface further down because they
   are not the closest.}    
 \end{figure}
+
+\paragraph{Source of errors}
+As stated earlier, numerical solutions for solving the level set equation can
+very easily become unstable.
+\begin{itemize}
+    \item \textbf{Reinitialization}: If reinitialization is used, the interface
+        can be displaced to incoherent positions, affecting numerical accuracy
+        in an undesirable way. This is why it is normally avoided as much as
+        possible. Methods have been developped to avoid the need for
+        reinitialization entirely, such as \cite{li2010distance} by \emph{Li,
+        Xu, Gui and Fox}.
+    \item \textbf{Incorrect gradient}: As stated earlier, central differences
+        should be avoided.
+    \item \textbf{Order of approximation}: First order approximations can lead
+        to numerical diffusion, higher order methods are prefered.
+    \item \textbf{Force (or speed) function}: The force function might be
+        well-defined around the level set but has no guarantees of stability
+        further out. This is why a force extension strategy can be used. 
+\end{itemize}
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
