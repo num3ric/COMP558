@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb,amsthm, graphicx, float}
+\usepackage{amsmath,amssymb,amsthm, graphicx, float, subfig}
 \usepackage{mathpazo}
 \author{Alexandre Vassalotti \quad \'{E}ric Renaud-Houde}
 \title{COMP 558: Final Project Report \\
@@ -268,6 +268,33 @@ very easily become unstable.
         well-defined around the level set but has no guarantees of stability
         further out. This is why a force extension strategy can be used. 
 \end{itemize}
+
+\section{Results}
+
+
+\begin{figure}[H]
+  \centering
+  \subfloat[Initial data set of
+  points.]{\includegraphics[width=0.50\textwidth]{img/dataset.png}}
+  ~
+  \subfloat[Unsigned distance function to the data set of
+  points.]{\includegraphics[width=0.50\textwidth]{img/signed_dist.png}} \\
+  \subfloat[Initial $\phi$ with the embedded level set curve
+  $\Gamma$.]{\includegraphics[width=0.50\textwidth]{img/lvl0.png}}
+  ~
+  \subfloat[$\phi$ and $\Gamma$ 80 frames
+  later.]{\includegraphics[width=0.50\textwidth]{img/lvl1.png}} \\
+  \subfloat[$\phi$ and $\Gamma$ 220 frames
+  later.]{\includegraphics[width=0.50\textwidth]{img/lvl2.png}}
+  ~
+  \subfloat[Final stable state of $\phi$ and its level set $\Gamma$.
+  ]{\includegraphics[width=0.50\textwidth]{img/lvl3.png}}
+\end{figure}
+
+
+
+
+\section{Conclusion}
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
