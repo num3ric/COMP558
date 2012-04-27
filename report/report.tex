@@ -71,7 +71,7 @@ Definitions:
     interface also called hypersurface).
 \end{itemize}
 
-\paragraph{Discretization}
+\subsection{Discretization}
 
 Given that the surface motion equation for $\phi$ is defined as a partial
 differential equation, we can solve it using iterative schemes for PDEs. As most
@@ -90,7 +90,7 @@ However, not only does the Euler method often suffers from stability problems,
 it is used in the context of \textit{ordinary differential equations}, not PDEs.
 In that case, a different numerical procedure is needed. 
 
-\subparagraph{Upwind Scheme}
+\paragraph{Upwind Scheme}
 One approach for discretizing PDEs, originally defined by Couran, Isaacson and
 Rees \cite{courant1952solution} is called the upwind scheme. Instead of using
 central differences for computing the partial derivatives, it uses both a
@@ -171,7 +171,7 @@ more stable. Note that there are higher-order schemes listed in
   It ultimately flattens out and remains so.}    
 \end{figure}
 
-\subparagraph{Implementation}
+\paragraph{Implementation}
 To implement the upwind scheme for the entire grid
 update, a few strategies can be used. In the contex of matlab or numpy, it is
 recommended to compute forward and backward differences using entire rows at
@@ -180,7 +180,7 @@ squared differences can be added on top of each other.  Furthermore for the
 edges of the grid, the inward row/column should be used in replacement if the
 difference exceeds the matrix.
 
-\paragraph{Forces governing surface evolution}
+\subsection{Forces governing surface evolution}
 Up until now, we have left one variable undefined, namely the force matrix $F$.
 The definition of this term very much depends on the application of the
 algorithm. For example, a popular approach used in 2d segmentation (for example
@@ -202,7 +202,7 @@ our dataset $S$.
 The role of this force is twofold: it simultaneously encourages smoothness in
 the level set and close fit to the data points which are attracting it.
 
-\subparagraph{Energy Functional}
+\paragraph{Energy Functional}
 To understand where this force formulation comes from, we have to understand how
 the desired level set surface is derived from an energy functional $E(\Gamma)$.
 Without restating all the derivations, the functional essentially takes in the
@@ -232,7 +232,7 @@ elastic membrane converging towards a minimal surface.
 %\item Quantifies how $\Gamma$ corresponds to the data set, with a smoothness constraint
 %\item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
 
-\subparagraph{Unsatisfactory local minimum}
+\paragraph{Unsatisfactory local minimum}
 Note that the level set can reach an unsatisfactory local minimum if the initial
 value was not close enough to the final surface. As such, it is expected that
 this methods results in some loss of details.
@@ -247,7 +247,7 @@ this methods results in some loss of details.
   are not the closest.}    
 \end{figure}
 
-\paragraph{Source of errors}
+\subsection{Source of errors}
 As stated earlier, numerical solutions for solving the level set equation can
 very easily become unstable.
 \begin{itemize}
