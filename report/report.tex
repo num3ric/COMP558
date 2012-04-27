@@ -15,16 +15,48 @@ standing problem in the computer vision community. Indeed, problem is known to
 be very challenging in three and higher dimensions. Furthermore, the problem
 is ill-posed which means there is not a unique solution. When the point cloud
 is dense enough and the topology of the surface is not complicated, a simple
-solution could be to perform a triangulation of points. However, even in this
+solution could be to perform a Denaulay triangulation of points, like
+described by Boissonnat \cite{boissonnat1984geometric}. However, even in this
 context ambiguities can arises and lead to non desirable surface
 reconstructions.
 
 A desirable reconstruction method should be able to deal with irregularities
 caused by noise and non-uniformity of the data collected. It should also be
 able to deal with complex surface topologies as well. In addition, the
-reconstructed surface should be representative of the point could data, be
-reasonably smooth yet maintain discontinuities.
+reconstructed surface should be representative of the point cloud. It should
+be reasonably smooth yet maintain discontinuities.
 
+Many approaches have been proposed to solve the surface reconstruction
+problem. In general, the solutions can be categorized by the surface
+representation they use---i.e, explicit or implicit. In an explicit
+representation, the location of all the points on the surface is described
+precisely. Triangulations methods yield such representations. Conversely, in
+an implicit representation, we describe the surface as a constraint in a
+higher dimension, or 3D space in our case. Implicit representations are often
+advantageous because they lead to solutions capablable of handling complex
+topologies. Their main drawback is they tend to be more expensive in time and
+space.
+
+Level-set methods are a class of techniques working on implicit
+representations. These methods were developed conjointly by Osher and Sethian
+\cite{sethian1999level}
+
+With the arrival of low-cost depth sensors, such as the Microsoft's Kinect,
+the opportunities for object and scene reconstruction are obvious. These depth
+sensors provide accurate and dense measurements. A caveat however is these new
+devices are typically structured light sensors. And the data from such devices
+have large holes due to the shadows casted by the objects being measured. This
+poses extras challenges for surfaces reconstruction.
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{img/depthmap.png}
+  \caption{In this depth image taken using Microsoft's Kinect sensor, we see
+holes, represented as black regions, where the sensor couldn't take
+measurements.}
+
+\end{figure}
 
 
 \section{Framework}
