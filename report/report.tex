@@ -15,7 +15,7 @@ standing problem in the computer vision community. Indeed, problem is known to
 be very challenging in three and higher dimensions. Furthermore, the problem
 is ill-posed which means there is not a unique solution. When the point cloud
 is dense enough and the topology of the surface is not complicated, a simple
-solution could be to perform a Denaulay triangulation of points, like
+solution could be to perform a Denaulay triangulation of points, as
 described by Boissonnat \cite{boissonnat1984geometric}. However, even in this
 context ambiguities can arises and lead to non desirable surface
 reconstructions.
@@ -37,7 +37,7 @@ advantageous because they lead to solutions capablable of handling complex
 topologies. Their main drawback is they tend to be more expensive in time and
 space.
 
-Level-set methods are a class of techniques for the deformation of implicit
+level set methods are a class of techniques for the deformation of implicit
 surfaces according to arbitrary rules. These methods were developed conjointly
 by Osher and Sethian \cite{sethian1999level} and are widely applicable to a
 variety of problems. In the context of surface reconstruction, Zhao showed
@@ -62,17 +62,42 @@ measurements.}
 
 \end{figure}
 
+\section{Level set method}
+The level set method involves the evolution of a function, called $\phi$,
+using an iterative scheme for numerical integration. The surface we wish to
+recover is represented as a constraint on $\phi$. Specifically, we define this
+surface as the level set $\Gamma=\{\mathbf{x}:\phi(\mathbf{x}, t)=0\}$.
 
-\section{Framework}
+The central problem of the level set method is to propagate the surface
+$\Gamma$ like a firefront. If a velocity field $\vec{v}$ gives the direction
+and speed of each point for movement, then the evolution of the surface
+$\Gamma$ over time $t$ is described by the equation
 
-Definitions:
-\begin{itemize}
-\item $\mathcal{S}$ : Data set of points.
-\item $\Gamma$ : Level set embedded in $\phi$ (a contour curve in 2d or an
-    isosurface in 3d).
-\item $\phi$ : Implicit level set function (the evolving higher dimensional
-    interface also called hypersurface).
-\end{itemize}
+\begin{align}
+  \frac{d \Gamma}{dt} = \vec{v}
+\end{align}
+
+This can be reformulated for $\phi$ to yield the fundamental level set
+equation
+\begin{align}
+  \frac{d \phi}{dt} + \vec{v} \cdot \nabla \phi = 0
+\end{align}
+
+We have yet to define the level set function $\phi$. One particularly
+attractive definition is the signed distance function $d(\mathbf{x})$, which
+gives the distance of a point to the surface and the sign: generally $d > 0$
+if the point $\mathbf{x}$ is outside and $d < 0$ if it is inside of the
+surface (assuming it is a closed surface). Although all definitions of $\phi$
+are equally good theoretically, we prefer the signed distance function to
+avoid numerical instabilities and inaccuracies during computations. But even
+with this definition, $\phi$ will not remain a signed distance function and we
+may need a reinitialization procedure to keep the level set intact
+\cite{peng1999pde}.
+
+Another advantage of the signed distance function is the fact that the
+gradient $\nabla d(\mathbf{x})$ is a unit vector for all
+$\mathbf{x}$. Moreover, it is the unit normal $\vec{n}(\mathbf{x})$ to the
+level sets.
 
 \subsection{Discretization}
 
@@ -188,7 +213,7 @@ Up until now, we have left one variable undefined, namely the force matrix $F$.
 The definition of this term very much depends on the application of the
 algorithm. For example, a popular approach used in 2d segmentation (for example
 in the context of medical imagery) is to employ (the magnitude of) gradients of
-the image to limit the evolution of the level. However with a pointcloud, the
+the image to limit the evolution of the level. However with a point cloud, the
 force must be derived differently. A formulation was specifically developped by
 Zhao in \cite{zhao2000implicit} and \cite{zhao2001fast} for shape reconstruction from an
 unorganized dataset of points.
