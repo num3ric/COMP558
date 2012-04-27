@@ -37,9 +37,10 @@ advantageous because they lead to solutions capablable of handling complex
 topologies. Their main drawback is they tend to be more expensive in time and
 space.
 
-Level-set methods are a class of techniques working on implicit
-representations. These methods were developed conjointly by Osher and Sethian
-\cite{sethian1999level}
+Level-set methods are a class of techniques for the deformation of implicit
+surfaces according to arbitrary rules. These methods were developed conjointly
+by Osher and Sethian \cite{sethian1999level} and are widely applicable to a
+variety of problems.
 
 With the arrival of low-cost depth sensors, such as the Microsoft's Kinect,
 the opportunities for object and scene reconstruction are obvious. These depth
@@ -186,7 +187,7 @@ algorithm. For example, a popular approach used in 2d segmentation (for example
 in the context of medical imagery) is to employ (the magnitude of) gradients of
 the image to limit the evolution of the level. However with a pointcloud, the
 force must be derived differently. A formulation was specifically developped by
-Zhao in \cite{zhao1} and \cite{zhao2001fast} for shape reconstruction from an
+Zhao in \cite{zhao2000implicit} and \cite{zhao2001fast} for shape reconstruction from an
 unorganized dataset of points.
 
 Stating his formulation upfront, we have:
@@ -206,7 +207,7 @@ To understand where this force formulation comes from, we have to understand how
 the desired level set surface is derived from an energy functional $E(\Gamma)$.
 Without restating all the derivations, the functional essentially takes in the
 level set as its input and assesses its surface energy in terms of distance to
-$S$. More precisely, Zhao\cite{zhao1} defined it as follows:
+$S$. More precisely, Zhao\cite{zhao2000implicit} defined it as follows:
 
 \begin{align}
     \label{eq:functional}
@@ -223,7 +224,7 @@ curvature $\kappa$ of $\Gamma$. In fact, in can be shown that the minimizer of
 \nabla d(\mathbf{x}) \cdot \mathbf{n} + d(\mathbf{x}) \kappa = 0
 \]
 With these terms used in the force formulation, and with the evolution equation
-expressed for $\phi$, equation \eqref{eq:force} is obtained. (See \cite{zhao1},
+expressed for $\phi$, equation \eqref{eq:force} is obtained. (See \cite{zhao2000implicit},
 \cite{zhao2001fast} and \cite{savadjiev2003surface} for more detailed
 explanations.) The resulting level set evolution should then behave as an
 elastic membrane converging towards a minimal surface.
