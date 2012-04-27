@@ -40,15 +40,18 @@ space.
 Level-set methods are a class of techniques for the deformation of implicit
 surfaces according to arbitrary rules. These methods were developed conjointly
 by Osher and Sethian \cite{sethian1999level} and are widely applicable to a
-variety of problems.
+variety of problems. In the context of surface reconstruction, Zhao showed
+\cite{zhao2001fast} how to apply these methods to minimize a given energy
+functional which is analogous to a least-square fitting on a point cloud. This
+is the approach we will explore in this report.
 
-With the arrival of low-cost depth sensors, such as the Microsoft's Kinect,
-the opportunities for object and scene reconstruction are obvious. These depth
-sensors provide accurate and dense measurements. A caveat however is these new
-devices are typically structured light sensors. And the data from such devices
-have large holes due to the shadows casted by the objects being measured. This
-poses extras challenges for surfaces reconstruction.
-
+Our final project was motivated by the arrival of low-cost depth sensors, such
+as the Microsoft's Kinect. The opportunities for object and scene
+reconstruction using these sensors are obvious. These depth sensors provide
+accurate and dense measurements. A caveat however is these new devices are
+typically structured light sensors. And the data from such devices have large
+holes due to the shadows casted by the objects being measured. This poses
+extras challenges for surfaces reconstruction.
 
 \begin{figure}
   \centering
