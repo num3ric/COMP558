@@ -10,7 +10,7 @@ import itertools
 
 eps = sys.float_info.epsilon
 
-im = numpy.array(Image.open("moo.png"))
+im = numpy.array(Image.open("dataimg/moo.png"))
 im = im / im.max()
 # plt.figure()
 # plt.imshow(im, cmap='gray')
