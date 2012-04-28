@@ -208,6 +208,24 @@ squared differences can be added on top of each other.  Furthermore for the
 edges of the grid, the inward row/column should be used in replacement if the
 difference exceeds the matrix.
 
+\subsubsection{Adaptive step size}
+Based on the work on level set stability and convergence by \textit{Chaudhury
+and Ramakrishnan} in \cite{chaudhury2007stability}, an adaptive step size can be
+easily implemented to make the evolution as fast as possible. Simply stated, the
+stability condition for the level set evolution is:
+\[
+F_{max} \cdot \Delta t \le \min(\Delta \mathbf{x})
+\]
+where $F_{max}$ is the maximum absolute speed of all the points on the grid and
+$\Delta \mathbf{x}$ is the grid spacing. Since we consider the grid size to be
+1, we can adaptively set the step size to the following:
+\[
+\Delta t \leftarrow q \cdot \frac{1}{F_{max}}
+\]
+where $q$ is a safety factor (it has a value slightly smaller than 1).
+
+
+
 \subsection{Forces governing surface evolution}
 
 Up until now, we have left one variable undefined, namely the force matrix $F$.
@@ -298,8 +316,10 @@ very easily become unstable.
 \end{itemize}
 
 \section{Results}
-
-
+In order to test the level set method described above, we started by
+implementing a 2d version of the level set evolution in python (using NumPy,
+SciPy, Scikit-fmm for solving the Eikonal equation and Matplotlib. Here are our
+final 2d results. While the evolution
 \begin{figure}[H]
   \centering
   \subfloat[Initial data set of
@@ -310,16 +330,13 @@ very easily become unstable.
   \subfloat[Initial $\phi$ with the embedded level set curve
   $\Gamma$.]{\includegraphics[width=0.50\textwidth]{img/lvl0.png}}
   ~
-  \subfloat[$\phi$ and $\Gamma$ 80 frames
+  \subfloat[$\phi$ and $\Gamma$, some frames
   later.]{\includegraphics[width=0.50\textwidth]{img/lvl1.png}} \\
-  \subfloat[$\phi$ and $\Gamma$ 220 frames
-  later.]{\includegraphics[width=0.50\textwidth]{img/lvl2.png}}
-  ~
+  \subfloat[$\phi$ and $\Gamma$ before the topology
+  change.]{\includegraphics[width=0.50\textwidth]{img/lvl2.png}} ~
   \subfloat[Final stable state of $\phi$ and its level set $\Gamma$.
   ]{\includegraphics[width=0.50\textwidth]{img/lvl3.png}}
 \end{figure}
-
-
 
 
 \section{Conclusion}

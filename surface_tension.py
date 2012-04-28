@@ -113,7 +113,7 @@ def lsm_grad_magnitude(f, up):
     return np.sqrt(out)
 
 # S = square(radius=25, spacing=5) # data set of points
-S = np.array(Image.open("dents.png"))
+S = np.array(Image.open("double1.png"))
 S = ndimage.laplace(ndimage.gaussian_filter(S-0.5,1))
 S = np.absolute(S < 30)
 D = ndimage.distance_transform_edt(S) # distance to data set
@@ -152,30 +152,35 @@ def compute_force(U, V, Gmag):
 
 # unitF = np.ones(grid_shape)
 
-def update_phi(P, dt):
+def compute_stepsize(F):
+    mf = np.max(np.absolute(F))
+    safety_factor = 0.88
+    return safety_factor / mf
+
+def update_phi(P):
     '''
     Step update (euler method) the level set PDE.
     '''
     [U, V] = np.gradient(P)
     Gmag = gradient_magnitude(U, V)
     F = compute_force(U, V, Gmag)
-    # print np.max(np.absolute(F))
+    dt = compute_stepsize(F)
     return P + dt * F * Gmag
     
 
 
-def update_phi_upwind(P, dt):
+def update_phi_upwind(P):
     '''
     Step update (euler method) the level set PDE using the upwind scheme.
     '''
     [U, V] = np.gradient(P)
     Gmag = gradient_magnitude(U, V)
     F = compute_force(U, V, Gmag)
+    dt = compute_stepsize(F)
     up = lsm_grad_magnitude(P, True)
     down = lsm_grad_magnitude(P, False)
     return P + dt *(np.maximum(F, 0)*down + np.minimum(F, 0)*up)
 
-dt = 0.02
 fig = plt.figure()
 
 # plt.ion()
@@ -200,8 +205,8 @@ frame = 0
 saved_frames = [0, 84, 220, 280]
 def updatefig(*args):
     global P, frame
-    for i in xrange(20):
-        P = update_phi(P, dt)
+    for i in xrange(50):
+        P = update_phi(P)
     P = skfmm.distance(P) #reinitialization
     im.set_array(P)
     # if frame % 50:
