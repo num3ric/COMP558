@@ -1,12 +1,12 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb,amsthm, graphicx, float}
+\usepackage{amsmath,amssymb,amsthm, graphicx, float, subfig}
 \usepackage{mathpazo}
 \author{Alexandre Vassalotti \quad \'{E}ric Renaud-Houde}
 \title{COMP 558: Final Project Report \\
   \large \textbf{Surface reconstruction using the level set method}
 }
 \date{27 April 2012}
-
+\setcounter{secnumdepth}{3}
 \begin{document}
 \maketitle
 \section{Introduction}
@@ -208,7 +208,7 @@ more stable. Note that there are higher-order schemes listed in
   It ultimately flattens out and remains so.}    
 \end{figure}
 
-\subsubsection{Implementation}
+\paragraph{Implementation}
 To implement the upwind scheme for the entire grid
 update, a few strategies can be used. In the contex of matlab or numpy, it is
 recommended to compute forward and backward differences using entire rows at
@@ -217,18 +217,35 @@ squared differences can be added on top of each other.  Furthermore for the
 edges of the grid, the inward row/column should be used in replacement if the
 difference exceeds the matrix.
 
+\subsubsection{Adaptive step size}
+Based on the work on level set stability and convergence by \textit{Chaudhury
+and Ramakrishnan} in \cite{chaudhury2007stability}, an adaptive step size can be
+easily implemented to make the evolution as fast as possible. Simply stated, the
+stability condition for the level set evolution is:
+\[
+F_{max} \cdot \Delta t \le \min(\Delta \mathbf{x})
+\]
+where $F_{max}$ is the maximum absolute speed of all the points on the grid and
+$\Delta \mathbf{x}$ is the grid spacing. Since we consider the grid size to be
+1 on all axes, we can adaptively set the step size to the following:
+\[
+\Delta t \leftarrow \frac{q}{F_{max}}
+\]
+where $q$ is a safety factor (it has a value slightly smaller than 1).
+
+
+
 \subsection{Forces governing surface evolution}
 
 Up until now, we have left one variable undefined, namely the force matrix $F$.
 The definition of this term very much depends on the application of the
 algorithm. For example, a popular approach used in 2d segmentation (for example
-
-in the context of medical imagery) is to employ (the magnitude of)
-gradients of the image to limit the evolution of the level set.
-However with a point cloud, the force must be derived differently. A
-formulation was specifically developped by Zhao in
-\cite{zhao2000implicit} and \cite{zhao2001fast} for shape
-reconstruction from an unorganized dataset of points. 
+in the context of medical imagery) is to employ (the magnitude of) gradients
+of an image to limit the evolution of the level set within a uniform region.
+However with a point cloud, the force must be derived differently. A formulation
+was specifically developped by Zhao in \cite{zhao2000implicit} and
+\cite{zhao2001fast} for shape reconstruction from an unorganized dataset of
+points. 
 
 Stating his formulation upfront, we have:
 \begin{align}
@@ -273,6 +290,7 @@ elastic membrane converging towards a minimal surface.
 %\item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
 
 \subsubsection{Unsatisfactory local minimum}
+\label{localmin}
 Note that the level set can reach an unsatisfactory local minimum if the initial
 value was not close enough to the final surface. As such, it is expected that
 this methods results in some loss of details.
@@ -302,9 +320,48 @@ very easily become unstable.
     \item \textbf{Order of approximation}: First order approximations can lead
         to numerical diffusion, higher order methods are prefered.
     \item \textbf{Force (or speed) function}: The force function might be
-        well-defined around the level set but has no guarantees of stability
-        further out. This is why a force extension strategy can be used. 
+        well-defined around the level set but could distort $\phi$
+        further out, requiring reinitialization procedures. 
 \end{itemize}
+
+\section{Results}
+In order to implement of the level set evolution as described above, we first
+favored a 2d version implementation in Python (using NumPy, SciPy, Scikit-fmm
+(for solving the Eikonal equation) and Matplotlib. Here are our final 2d
+results.
+\begin{figure}[H]
+  \centering
+  \subfloat[Initial data set of
+  points.]{\includegraphics[width=0.50\textwidth]{img/dataset.png}}
+  ~
+  \subfloat[Unsigned distance function to the data set of
+  points.]{\includegraphics[width=0.50\textwidth]{img/signed_dist.png}} \\
+  \subfloat[Initial $\phi$ with the embedded level set curve
+  $\Gamma$.]{\includegraphics[width=0.50\textwidth]{img/lvl0.png}}
+  ~
+  \subfloat[$\phi$ and $\Gamma$, some frames
+  later.]{\includegraphics[width=0.50\textwidth]{img/lvl1.png}} \\
+  \subfloat[$\phi$ and $\Gamma$ before the topology
+  change.]{\includegraphics[width=0.50\textwidth]{img/lvl2.png}} ~
+  \subfloat[Final stable state of $\phi$ and its level set $\Gamma$.
+  ]{\includegraphics[width=0.50\textwidth]{img/lvl3.png}}
+\end{figure}
+
+As stated in section \ref{localmin}, since our implementation is based on
+Zhang's force formulation it might sometimes suffer from loss of surface
+details. We confirmed this expected behavior using a shape with pronounced
+concavities.
+
+\begin{figure}[H]
+  \centering
+  \subfloat[Shape acting as $S$.]{\includegraphics[width=0.50\textwidth]{img/dents.png}} 
+  ~
+  \subfloat[The level set reaches an unsatisfactory local
+  minimum.]{\includegraphics[width=0.50\textwidth]{img/dents_contour.png}}
+\end{figure}
+
+
+\section{Conclusion}
 
 \bibliographystyle{amsplain}
 \bibliography{vision}

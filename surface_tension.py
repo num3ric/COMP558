@@ -6,8 +6,10 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import ndimage
+import skfmm
 import sys
 import itertools
+import pickle
 
 eps = sys.float_info.epsilon
 
@@ -63,6 +65,9 @@ def gradient_magnitude(U, V):
     return np.maximum(np.sqrt(U**2 + V**2), eps)
 
 def lsm_grad_magnitude(f, up):
+    '''
+    The gradient magnitude using the upwind scheme.
+    '''
     otype = f.dtype.char
     if otype not in ['f', 'd', 'F', 'D']:
         otype = 'd'
@@ -108,10 +113,10 @@ def lsm_grad_magnitude(f, up):
     return np.sqrt(out)
 
 # S = square(radius=25, spacing=5) # data set of points
-S = np.array(Image.open("double.png"))
+S = np.array(Image.open("double1.png"))
 S = ndimage.laplace(ndimage.gaussian_filter(S-0.5,1))
-S = (np.absolute(S) > 50)
-D = ndimage.distance_transform_edt(1-S) # distance to data set
+S = np.absolute(S < 30)
+D = ndimage.distance_transform_edt(S) # distance to data set
 [Du, Dv] = np.gradient(D)
 # image = np.array(Image.open("cir.png"))
 # Phi0 = (image - image.max() / 2) / 255
@@ -119,16 +124,16 @@ D = ndimage.distance_transform_edt(1-S) # distance to data set
 Phi0 = np.ones(grid_shape)
 Phi0[cx, cy] = 0
 Phi0 = ndimage.distance_transform_edt(Phi0)
-Phi0 -= 0.65*np.max(Phi0)
+P = Phi0 -  0.65*np.max(Phi0)
 
 # plt.figure()
-# plt.imshow(S)
+# plt.imshow(1-S, cmap='gray')
 # fig = plt.figure()
 # cax = plt.imshow(D)
 # fig.colorbar(cax)
 # plt.figure()
-# plt.imshow(Phi0,cmap='gray')
-# plt.contour(Phi0, levels=[0])
+# plt.imshow(P,cmap='jet')
+# plt.contour(P, levels=[0])
 
 def compute_force(U, V, Gmag):
     '''
@@ -138,46 +143,75 @@ def compute_force(U, V, Gmag):
     ST = D * divergence(U/Gmag, V/Gmag)
     return PF + ST
 
+# [U, V] = np.gradient(Phi0)
+# Gmag = gradient_magnitude(U, V)
+# fig = plt.figure()
+# im = plt.imshow((Du * U + Dv * V)/Gmag)
+# fig.colorbar(im)
+
+
 # unitF = np.ones(grid_shape)
 
-def update_phi(P, dt):
+def compute_stepsize(F):
+    mf = np.max(np.absolute(F))
+    safety_factor = 0.88
+    return safety_factor / mf
+
+def update_phi(P):
     '''
     Step update (euler method) the level set PDE.
     '''
     [U, V] = np.gradient(P)
     Gmag = gradient_magnitude(U, V)
     F = compute_force(U, V, Gmag)
+    dt = compute_stepsize(F)
+    return P + dt * F * Gmag
+    
+
+
+def update_phi_upwind(P):
+    '''
+    Step update (euler method) the level set PDE using the upwind scheme.
+    '''
+    [U, V] = np.gradient(P)
+    Gmag = gradient_magnitude(U, V)
+    F = compute_force(U, V, Gmag)
+    dt = compute_stepsize(F)
     up = lsm_grad_magnitude(P, True)
     down = lsm_grad_magnitude(P, False)
-    # return P + dt * F * Gmag
-    # return P + dt * (up + down)
     return P + dt *(np.maximum(F, 0)*down + np.minimum(F, 0)*up)
 
-# def renormalize(P, dt): #not working...
-#     [U, V] = np.gradient(P)
-#     Gmag = gradient_magnitude(U, V)
-#     S = P/np.sqrt(P*P + Gmag)
-#     return P + dt*S * (1-Gmag)
-
-dt = 0.1
-P = Phi0
 fig = plt.figure()
 
 # plt.ion()
 # for i in itertools.count():
-#     P = update_phi(P, dt)
-#     plt.clf()
-#     im = plt.imshow(P, cmap='jet')
-#     # plt.contour(P, levels=[0])
-#     fig.colorbar(im)
-#     plt.draw()
+#     if i % 100 == 0:
+#         P = update_phi(P, dt)
+#         plt.clf()
+#         im = plt.imshow(P, cmap='jet')
+#         plt.contour(P, levels=[0])
+#         fig.colorbar(im)
+#         plt.draw()
+
 
 im = plt.imshow(P, cmap='jet')
 fig.colorbar(im)
+    
+def save_figure(P, number=99):
+    with open(str(number)+'p.pickle', 'w') as f:
+        pickle.dump(skfmm.distance(P), f)
+
+frame = 0
+saved_frames = [0, 84, 220, 280]
 def updatefig(*args):
-    global P
-    P = update_phi(P, dt)
+    global P, frame
+    for i in xrange(50):
+        P = update_phi(P)
+    P = skfmm.distance(P) #reinitialization
     im.set_array(P)
+    # if frame % 50:
+    #     save_figure(P)
+    frame = frame + 1 
     return im,
 ani = animation.FuncAnimation(fig, updatefig, interval=50, blit=True)
 
