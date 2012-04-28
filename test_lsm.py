@@ -7,7 +7,7 @@ import matplotlib.animation as animation
 import Image
 
 
-image = numpy.array(Image.open("moo.png"))
+image = numpy.array(Image.open("dataimg/moo.png"))
 
 P = (image - image.max() / 2) / 255
 fig = plt.figure()

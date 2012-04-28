@@ -10,6 +10,11 @@ from scipy import ndimage
 import sys
 import itertools
 
+'''
+Warning: unstable evolution.
+Please refer to final_lsm.py for a better version (only in 2d.)
+'''
+
 eps = sys.float_info.epsilon
 
 cube = 100
@@ -96,14 +101,6 @@ def update_phi(P, dt):
     Gmag = gradient_magnitude(U, V, W)
     F = compute_force(U, V, W, Gmag)
     return P + dt * F * Gmag
-
-# def renormalize(P, dt): #not working...
-#     [U, V] = np.gradient(P)
-#     Gmag = gradient_magnitude(U, V)
-#     S = P/np.sqrt(P*P + Gmag)
-#     return P + dt*S * (1-Gmag)
-
-
 
 dt = 0.01
 P = Phi0

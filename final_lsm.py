@@ -113,12 +113,12 @@ def lsm_grad_magnitude(f, up):
     return np.sqrt(out)
 
 # S = square(radius=25, spacing=5) # data set of points
-S = np.array(Image.open("double1.png"))
+S = np.array(Image.open("dataimg/double1.png"))
 S = ndimage.laplace(ndimage.gaussian_filter(S-0.5,1))
 S = np.absolute(S < 30)
 D = ndimage.distance_transform_edt(S) # distance to data set
 [Du, Dv] = np.gradient(D)
-# image = np.array(Image.open("cir.png"))
+# image = np.array(Image.open("dataimg/cir.png"))
 # Phi0 = (image - image.max() / 2) / 255
 
 Phi0 = np.ones(grid_shape)
@@ -182,36 +182,15 @@ def update_phi_upwind(P):
     return P + dt *(np.maximum(F, 0)*down + np.minimum(F, 0)*up)
 
 fig = plt.figure()
-
-# plt.ion()
-# for i in itertools.count():
-#     if i % 100 == 0:
-#         P = update_phi(P, dt)
-#         plt.clf()
-#         im = plt.imshow(P, cmap='jet')
-#         plt.contour(P, levels=[0])
-#         fig.colorbar(im)
-#         plt.draw()
-
-
 im = plt.imshow(P, cmap='jet')
 fig.colorbar(im)
     
-def save_figure(P, number=99):
-    with open(str(number)+'p.pickle', 'w') as f:
-        pickle.dump(skfmm.distance(P), f)
-
-frame = 0
-saved_frames = [0, 84, 220, 280]
 def updatefig(*args):
-    global P, frame
+    global P
     for i in xrange(50):
         P = update_phi(P)
     P = skfmm.distance(P) #reinitialization
     im.set_array(P)
-    # if frame % 50:
-    #     save_figure(P)
-    frame = frame + 1 
     return im,
 ani = animation.FuncAnimation(fig, updatefig, interval=50, blit=True)
 
