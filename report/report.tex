@@ -334,8 +334,7 @@ very easily become unstable.
 \section{Results}
 In order to implement of the level set evolution as described above, we first
 favored a 2d version implementation in Python (using NumPy, SciPy, Scikit-fmm
-(for solving the Eikonal equation) and Matplotlib. Here are our final 2d
-results.
+(for solving the Eikonal equation) and Matplotlib. Here are our final results.
 \begin{figure}[H]
   \centering
   \subfloat[Initial data set of
@@ -369,6 +368,27 @@ concavities.
 
 
 \section{Conclusion}
+
+In order to reconstruct surface so that it conforms to a data set of points, we
+have seen how to treat an interface implicity through $\phi$ and how to evolve
+it using a discretized level set method. Using Zhao's force formulation, we have
+detailed how the level set interface acts as an elastic membrane trying to
+minimize its area, effectly ``shrink wrapping'' the data points.
+
+
+While this method is powerful in dealing with complex topologies and can
+certainly help smooth noisy input, it proved to be very challenging in regard to
+the numerical stability and convergence. The speed of convergence proved to be
+notably slow both in terms its step size (even with the adaptive technique)
+and in terms of raw computational complexity.
+
+We have attempted to transfer our 2d implementation to a 3d grid, but the
+results were either incorrect due to the grid size being too small or impossibly
+slow to converge due to cubic growth. To deal with this lack of effiency, the
+optimization method developped by Adalsteinsson and Sethian in
+\cite{adalsteinsson1994fast} called the narrow band method is almost obligatory
+for the level set method to be reallistically usable. Future work for
+applications using the Kinect data should therefore make it their priority.
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
