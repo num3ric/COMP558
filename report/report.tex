@@ -37,7 +37,7 @@ advantageous because they lead to solutions capablable of handling complex
 topologies. Their main drawback is they tend to be more expensive in time and
 space.
 
-level set methods are a class of techniques for the deformation of implicit
+Level set methods are a class of techniques for the deformation of implicit
 surfaces according to arbitrary rules. These methods were developed conjointly
 by Osher and Sethian \cite{sethian1999level} and are widely applicable to a
 variety of problems. In the context of surface reconstruction, Zhao showed
@@ -48,10 +48,10 @@ is the approach we will explore in this report.
 Our final project was motivated by the arrival of low-cost depth sensors, such
 as the Microsoft's Kinect. The opportunities for object and scene
 reconstruction using these sensors are obvious. These depth sensors provide
-accurate and dense measurements. A caveat however is these new devices are
-typically structured light sensors. And the data from such devices have large
-holes due to the shadows casted by the objects being measured. This poses
-extras challenges for surfaces reconstruction.
+accurate and dense measurements from structured light. A caveat however is the
+depth data from such sensors have large holes due to the shadows casted by the
+objects being measured. This poses extras challenges for surfaces
+reconstruction.
 
 \begin{figure}
   \centering
@@ -62,7 +62,8 @@ measurements.}
 
 \end{figure}
 
-\section{Level set method}
+\section{Background}
+\subsection{Level set method}
 The level set method involves the evolution of a function, called $\phi$,
 using an iterative scheme for numerical integration. The surface we wish to
 recover is represented as a constraint on $\phi$. Specifically, we define this
@@ -108,113 +109,110 @@ with this definition, $\phi$ will not remain a signed distance function and we
 may need a reinitialization procedure to keep the level set intact
 \cite{peng1999pde}.
 
-\subsection{Discretization}
-
-Given that the surface motion equation for $\phi$ is defined as a partial
-differential equation, we can solve it using iterative schemes for PDEs. As most
+\subsection{Discrete time and space formulation}
+Given that the motion of $\phi$ is formulated as a differential equation, we
+can solve it using an iterative scheme for numerical integration. As most
 differential equations which might appear fairly innocuous at first, solving
-them numerically can be quite challenging.
+them numerically can present quite a challenge.
 
-Given an initial value $\phi_0$, our first intution might be to apply the
-first-order Euler method as follows:
+Assuming we have an initial value for $\phi^0$ at time $t=0$, we can use the the
+finite difference formula for the derivative to estimate
 \begin{align}
-  \frac{\partial \phi}{\partial t} + F \|\nabla \phi\| &= 0 \\
-  \frac{\phi^{t+1} - \phi^{t}}{\Delta t} &=  -F \|\nabla \phi\| \\
-  \phi^{t+1} &= \phi^{t} - \Delta t \; F \|\nabla \phi\| 
+  \frac{\partial \phi}{\partial t} \approx \frac{\phi^{n+1} - \phi^{n}}{\Delta t}
 \end{align}
+and to produce the first-order approximation of the solution
+\begin{align}
+  \phi^{n+1} &= \phi^{n} - \Delta t \, F |\nabla \phi|
+\end{align}
+However, we cannot use the finite difference to estimate reliably $\nabla
+\phi$ as this approximation will suffer from stability problems in the
+presence of topological changes. Therefore, a different numerical procedure is
+needed.
 
-However, not only does the Euler method often suffers from stability problems,
-it is used in the context of \textit{ordinary differential equations}, not PDEs.
-In that case, a different numerical procedure is needed. 
-
-\subsubsection{Upwind Scheme}
+\paragraph{Upwind Scheme}
 One approach for discretizing PDEs, originally defined by Couran, Isaacson and
 Rees \cite{courant1952solution} is called the upwind scheme. Instead of using
-central differences for computing the partial derivatives, it uses both a
-forward or a backward difference:
-
+central differences for approximating the first derivative, the scheme uses
+both the forward or the backward difference formul\ae. So if we assume $\phi$
+is discretized with respect to space on a uniform 3D grid where the entries
+are indexed by $\phi_{i,j,k}$ in the $x$, $y$ and $z$ directions respectively,
+then the first-order forward and backward difference formul$\ae$ in the $x$
+direction are
 \begin{align}
-    \frac{\partial p}{\partial x}^{-} &= p^{-}_x = \frac{p_i -
-    p_{i-1}}{ \Delta x} = p_i - p_{i-1} \\
-    \frac{\partial p}{\partial x}^{+} &= p^{+}_x = \frac{p^{i+1}_x -
-    p^i_x}{ \Delta x} = p^{i+1}_x - p^i_x  
-\end{align} since $ \Delta x = 1 $ in our grid. The same applies for other axes
-$y$ and $z$.
-
-\begin{figure}[htb]
+  D^{+x} &= \frac{\phi_{i+1,j,k} - \phi_{i,j,k}}{\Delta x} \\
+  D^{-x} &= \frac{\phi_{i,j,k} - \phi_{i-1,j,k}}{\Delta x}
+\end{align}
+We have analoguous formul$\ae$ for other axes $y$ and $z$. Figure
+\ref{fig:fbd} illustrate the formul$\ae$ in the 2D case.
+\begin{figure}
   \centering
   \includegraphics[width=0.45\textwidth]{img/upwind_grid.png}
-  \caption{Illustration of the forward and backward differences over a 2d grid.}    
+  \caption{Illustration of the forward and backward differences over a 2D grid.}    
+  \label{fig:fbd}
 \end{figure}
-
-
-Later used by Sethian\cite{sethian1999level} \cite{sethian1999advancing} for the
-initial value formulation, he defines the (now standard) level set method as
-follows (let $ p = \phi_{ijk}$):
-
+These lead to a simple first-order scheme proposed by Osher and Sethian to
+estimate the level set evolution
 \[
-p^{n+1} = p^{n} - \Delta t [ \max(F_{ijk}, 0) \| \nabla p \|^{+} + \min(F_{ijk},
-0) \| \nabla p \|^{-} ]
+\phi^{n+1}_{ijk} = \phi^{n}_{ijk} - \Delta t [ \max(F_{ijk}, 0)  \nabla^{+}\phi
+  + \min(F_{ijk},0) \nabla^{-}\phi  ]
 \]
-where:
+where
 \begin{align}
-    \| \nabla p \|^{+} & = 
+  \nabla^{+} & = 
     \begin{bmatrix}
-        \max(p^{-}_x, 0)^2 + \min(p^{+}_x, 0)^2 + \\
-        \max(p^{-}_y, 0)^2 + \min(p^{+}_y, 0)^2 + \\
-        \max(p^{-}_z, 0)^2 + \min(p^{+}_z, 0)^2
+        \max(\phi^{-x}, 0)^2 + \min(\phi^{+x}, 0)^2 + \\
+        \max(\phi^{-y}, 0)^2 + \min(\phi^{+y}, 0)^2 + \\
+        \max(\phi^{-z}, 0)^2 + \min(\phi^{+z}, 0)^2
     \end{bmatrix}^{1/2}  \\
-    \| \nabla p \|^{-} & = 
+    \nabla^{-} & = 
     \begin{bmatrix}
-        \max(p^{+}_x, 0)^2 + \min(p^{-}_x, 0)^2 + \\
-        \max(p^{+}_y, 0)^2 + \min(p^{-}_y, 0)^2 + \\
-        \max(p^{+}_z, 0)^2 + \min(p^{-}_z, 0)^2
+        \max(\phi^{+x}, 0)^2 + \min(\phi^{-x}, 0)^2 + \\
+        \max(\phi^{+y}, 0)^2 + \min(\phi^{-y}, 0)^2 + \\
+        \max(\phi^{+z}, 0)^2 + \min(\phi^{-z}, 0)^2
     \end{bmatrix}^{1/2} 
 \end{align}
-
-Rewriting this equation in terms of the entire grid matrices, and defining
-$\odot$ as element-wise matrix mutiplication, we have the following formulation
-which updates our entire grid for $\phi$:
-\[
-\phi^{n+1} = \phi^{n} - \Delta t [ \max(F, 0) \odot \| \nabla \phi \|^{+} +
-\min(F, 0) \odot \| \nabla \phi \|^{-} ]
-\]
-
 As opposed to computing the magnitude of the gradient using the central
-differences functions, the evolution of $\phi$ under the upwind scheme is much
-more stable. Note that there are higher-order schemes listed in
-\cite{sethian1999level} if more stability is required.
+differences functions, we found the evolution of $\phi$ under the upwind
+scheme to be much more stable. We show in figure \ref{fig:up2} and
+\ref{fig:up3} the result of applying different schemes on the initial level set
+function shown in figure \ref{fig:up1}.
 
-\begin{figure}[H]
+Note, other higher-order schemes are also available when more stability and
+accuracy are required.
+
+\begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{img/up01.png}
-  \caption{Initial hypersurface $\phi$ defined as a signed distance function
-  (for a level set in 2d).}    
+  \caption{Initial level set function $\phi$ defined as the signed distance
+    function to a 2D curve.}
+  \label{fig:up1}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{img/up03.png}
-  \caption{Result of 140 iterations using $\Delta t = 0.5$ and a constant force
-  of 1 using the central differences approximations. The resulting hypersurface
-  has exploded in the center and near the borders.}    
+  \caption{Result of 140 iterations using $\Delta t = 0.5$ and a constant
+    force $F=1$ using the central differences approximations. The resulting
+    $\phi$ has exploded in the center and near the borders.}
+  \label{fig:up2}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{img/up02.png}
-  \caption{Result of 140 iterations using $ \Delta t = 0.5$ and a constant force
-  of 1 using the upwind scheme. The hypersurface evolution is perfectly stable.
-  It ultimately flattens out and remains so.}    
+  \caption{Result of 140 iterations using $\Delta t = 0.5$ and a constant
+    force $F=1$ using the upwind scheme. The level set evolution is very
+    stable in case. It ultimately reaches a steady state.}
+  \label{fig:up3}
 \end{figure}
 
 \paragraph{Implementation}
-To implement the upwind scheme for the entire grid
-update, a few strategies can be used. In the contex of matlab or numpy, it is
-recommended to compute forward and backward differences using entire rows at
-once. Also note that only one matrix is needed to store the results because the
-squared differences can be added on top of each other.  Furthermore for the
-edges of the grid, the inward row/column should be used in replacement if the
+To implement the upwind scheme for the entire grid update, a few strategies
+can be used. In the contex of \textsc{MATLAB} or NumPy, it is recommended to
+compute forward and backward differences using entire rows at once. Also note
+that only one matrix is needed to store the results because the squared
+differences can be added on top of each other.  Furthermore for the edges of
+the grid, the inward row/column should be used in replacement if the
 difference exceeds the matrix.
 
 \subsubsection{Adaptive step size}
@@ -232,7 +230,6 @@ $\Delta \mathbf{x}$ is the grid spacing. Since we consider the grid size to be
 \Delta t \leftarrow \frac{q}{F_{max}}
 \]
 where $q$ is a safety factor (it has a value slightly smaller than 1).
-
 
 
 \subsection{Forces governing surface evolution}
