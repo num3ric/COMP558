@@ -218,9 +218,9 @@ F_{max} \cdot \Delta t \le \min(\Delta \mathbf{x})
 \]
 where $F_{max}$ is the maximum absolute speed of all the points on the grid and
 $\Delta \mathbf{x}$ is the grid spacing. Since we consider the grid size to be
-1, we can adaptively set the step size to the following:
+1 on all axes, we can adaptively set the step size to the following:
 \[
-\Delta t \leftarrow q \cdot \frac{1}{F_{max}}
+\Delta t \leftarrow \frac{q}{F_{max}}
 \]
 where $q$ is a safety factor (it has a value slightly smaller than 1).
 
@@ -231,13 +231,12 @@ where $q$ is a safety factor (it has a value slightly smaller than 1).
 Up until now, we have left one variable undefined, namely the force matrix $F$.
 The definition of this term very much depends on the application of the
 algorithm. For example, a popular approach used in 2d segmentation (for example
-
-in the context of medical imagery) is to employ (the magnitude of)
-gradients of the image to limit the evolution of the level set.
-However with a point cloud, the force must be derived differently. A
-formulation was specifically developped by Zhao in
-\cite{zhao2000implicit} and \cite{zhao2001fast} for shape
-reconstruction from an unorganized dataset of points. 
+in the context of medical imagery) is to employ (the magnitude of) gradients
+of an image to limit the evolution of the level set within a uniform region.
+However with a point cloud, the force must be derived differently. A formulation
+was specifically developped by Zhao in \cite{zhao2000implicit} and
+\cite{zhao2001fast} for shape reconstruction from an unorganized dataset of
+points. 
 
 Stating his formulation upfront, we have:
 \begin{align}
@@ -312,8 +311,8 @@ very easily become unstable.
     \item \textbf{Order of approximation}: First order approximations can lead
         to numerical diffusion, higher order methods are prefered.
     \item \textbf{Force (or speed) function}: The force function might be
-        well-defined around the level set but has no guarantees of stability
-        further out. This is why a force extension strategy can be used. 
+        well-defined around the level set but could distort $\phi$
+        further out, requiring reinitialization procedures. 
 \end{itemize}
 
 \section{Results}
