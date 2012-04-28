@@ -370,9 +370,10 @@ concavities.
 \section{Conclusion}
 
 In order to reconstruct surface so that it conforms to a data set of points, we
-have seen how to treat an interface implicity through $\phi$ and how to evolve
-it using a discretized level set method. Using Zhao's force formulation, we have
-detailed how the level set interface acts as an elastic membrane trying to
+have seen how to represent a surface implicity through $\phi$ and how to evolve
+it using level set method. We have detailed numerical discretization methods
+used to solve the level set PDE. Furthermore using Zhao's force formulation, we
+have detailed how the level set surface acts as an elastic membrane trying to
 minimize its area, effectly ``shrink wrapping'' the data points.
 
 
@@ -382,13 +383,15 @@ the numerical stability and convergence. The speed of convergence proved to be
 notably slow both in terms its step size (even with the adaptive technique)
 and in terms of raw computational complexity.
 
-We have attempted to transfer our 2d implementation to a 3d grid, but the
+We have attempted to transfer our 2D implementation to a 3D grid, but the
 results were either incorrect due to the grid size being too small or impossibly
 slow to converge due to cubic growth. To deal with this lack of effiency, the
-optimization method developped by Adalsteinsson and Sethian in
-\cite{adalsteinsson1994fast} called the narrow band method is almost obligatory
-for the level set method to be reallistically usable. Future work for
-applications using the Kinect data should therefore make it their priority.
+optimization method developed by Adalsteinsson and Sethian
+\cite{adalsteinsson1994fast} called the narrow band method is almost
+obligatory for the level set method to be reallistically usable. Future work for
+applications using the Kinect data should therefore make it their priority. One
+might even attempt to harness the power of the GPU for real-time
+applications.
 
 \bibliographystyle{amsplain}
 \bibliography{vision}
