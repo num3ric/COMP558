@@ -74,13 +74,27 @@ and speed of each point for movement, then the evolution of the surface
 $\Gamma$ over time $t$ is described by the equation
 
 \begin{align}
-  \frac{d \Gamma}{dt} = \vec{v}
+  \frac{\partial \Gamma}{\partial t} = \vec{v}
 \end{align}
 
-This can be reformulated for $\phi$ to yield the fundamental level set
-equation
+This can be extended to all level sets of $\phi$ to yield the fundamental
+level set equation
 \begin{align}
-  \frac{d \phi}{dt} + \vec{v} \cdot \nabla \phi = 0
+  \frac{\partial \phi}{\partial t} + \vec{v} \cdot \nabla \phi = 0
+  \label{eq:lsm1}
+\end{align}
+
+Moreover, we can observe that it is only the normal component $F$ of the
+velocity field to level sets that moves the surface. So by reformulating
+\begin{align}
+  \vec{v} \cdot \nabla \phi
+  = \vec{v} \cdot \frac{\nabla \phi}{|\nabla \phi|}|\nabla \phi| 
+  = F|\nabla \phi|
+\end{align}
+we find another form of the level set equation (\ref{eq:lsm1}) more suitable
+for computation
+\begin{align}
+  \frac{\partial \phi}{\partial t} + F|\nabla \phi| = 0
 \end{align}
 
 We have yet to define the level set function $\phi$. One particularly
@@ -93,11 +107,6 @@ avoid numerical instabilities and inaccuracies during computations. But even
 with this definition, $\phi$ will not remain a signed distance function and we
 may need a reinitialization procedure to keep the level set intact
 \cite{peng1999pde}.
-
-Another advantage of the signed distance function is the fact that the
-gradient $\nabla d(\mathbf{x})$ is a unit vector for all
-$\mathbf{x}$. Moreover, it is the unit normal $\vec{n}(\mathbf{x})$ to the
-level sets.
 
 \subsection{Discretization}
 
