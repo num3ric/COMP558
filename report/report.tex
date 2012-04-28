@@ -63,6 +63,7 @@ measurements.}
 \end{figure}
 
 \section{Level set method}
+\label{sec:lsm}
 The level set method involves the evolution of a function, called $\phi$,
 using an iterative scheme for numerical integration. The surface we wish to
 recover is represented as a constraint on $\phi$. Specifically, we define this
@@ -234,6 +235,15 @@ $\Delta \mathbf{x}$ is the grid spacing. Since we consider the grid size to be
 where $q$ is a safety factor (it has a value slightly smaller than 1).
 
 
+\subsubsection{Reinitialization}
+As stated in section \ref{sec:lsm}, a reinitialization step might be needed,
+especially for forces using mean curvatures. In essence, the reinitialization
+will reset the level set to be a signed distance function to the front, so that
+$\phi$ can be modelled by the following Eikonal equation:
+\[
+| \nabla d(\mathbf{x}) | = 1, d(\mathbf{x}) = 0, \mathbf{x} \in \Gamma
+\]
+This is usually solved using a Fast Marching Method[sethian1999advancing].
 
 \subsection{Forces governing surface evolution}
 
@@ -354,7 +364,7 @@ concavities.
 
 \begin{figure}[H]
   \centering
-  \subfloat[Shape acting as $S$.]{\includegraphics[width=0.50\textwidth]{img/dents.png}} 
+  \subfloat[Shape whose outline acts as $S$.]{\includegraphics[width=0.50\textwidth]{img/dents.png}} 
   ~
   \subfloat[The level set reaches an unsatisfactory local
   minimum.]{\includegraphics[width=0.50\textwidth]{img/dents_contour.png}}
