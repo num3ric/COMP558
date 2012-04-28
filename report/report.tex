@@ -6,7 +6,7 @@
   \large \textbf{Surface reconstruction using the level set method}
 }
 \date{27 April 2012}
-
+\setcounter{secnumdepth}{3}
 \begin{document}
 \maketitle
 \section{Introduction}
@@ -199,7 +199,7 @@ more stable. Note that there are higher-order schemes listed in
   It ultimately flattens out and remains so.}    
 \end{figure}
 
-\subsubsection{Implementation}
+\paragraph{Implementation}
 To implement the upwind scheme for the entire grid
 update, a few strategies can be used. In the contex of matlab or numpy, it is
 recommended to compute forward and backward differences using entire rows at
@@ -282,6 +282,7 @@ elastic membrane converging towards a minimal surface.
 %\item Has two global minima: $\Gamma = \Gamma_0$  and $\Gamma = \emptyset$.
 
 \subsubsection{Unsatisfactory local minimum}
+\label{localmin}
 Note that the level set can reach an unsatisfactory local minimum if the initial
 value was not close enough to the final surface. As such, it is expected that
 this methods results in some loss of details.
@@ -316,10 +317,10 @@ very easily become unstable.
 \end{itemize}
 
 \section{Results}
-In order to test the level set method described above, we started by
-implementing a 2d version of the level set evolution in python (using NumPy,
-SciPy, Scikit-fmm for solving the Eikonal equation and Matplotlib. Here are our
-final 2d results. While the evolution
+In order to implement of the level set evolution as described above, we first
+favored a 2d version implementation in Python (using NumPy, SciPy, Scikit-fmm
+(for solving the Eikonal equation) and Matplotlib. Here are our final 2d
+results.
 \begin{figure}[H]
   \centering
   \subfloat[Initial data set of
@@ -336,6 +337,19 @@ final 2d results. While the evolution
   change.]{\includegraphics[width=0.50\textwidth]{img/lvl2.png}} ~
   \subfloat[Final stable state of $\phi$ and its level set $\Gamma$.
   ]{\includegraphics[width=0.50\textwidth]{img/lvl3.png}}
+\end{figure}
+
+As stated in section \ref{localmin}, since our implementation is based on
+Zhang's force formulation it might sometimes suffer from loss of surface
+details. We confirmed this expected behavior using a shape with pronounced
+concavities.
+
+\begin{figure}[H]
+  \centering
+  \subfloat[Shape acting as $S$.]{\includegraphics[width=0.50\textwidth]{img/dents.png}} 
+  ~
+  \subfloat[The level set reaches an unsatisfactory local
+  minimum.]{\includegraphics[width=0.50\textwidth]{img/dents_contour.png}}
 \end{figure}
 
 
